@@ -1,0 +1,4 @@
+*.o
+CircleDetector
+*_test
+.vscode/
