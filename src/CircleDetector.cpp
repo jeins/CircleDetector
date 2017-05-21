@@ -71,7 +71,7 @@ QImage CircleDetector::detect(const QImage &source, unsigned int min_r, unsigned
   return detection;
 }
 
-void HoughCircleDetector::accum_circle(Image &image, const QPoint &position, unsigned int radius)
+void CircleDetector::accum_circle(Image &image, const QPoint &position, unsigned int radius)
 {
   int f = 1 - radius;
   int ddF_x = 1;
@@ -108,7 +108,7 @@ void HoughCircleDetector::accum_circle(Image &image, const QPoint &position, uns
   }
 }
 
-void HoughCircleDetector::accum_pixel(Image &image, const QPoint &position)
+void CircleDetector::accum_pixel(Image &image, const QPoint &position)
 {
   /* bounds checking */
   if(position.x() < 0 || position.x() >= image.size() ||
@@ -120,7 +120,7 @@ void HoughCircleDetector::accum_pixel(Image &image, const QPoint &position)
   image[position.x()][position.y()]++;
 }
 
-void HoughCircleDetector::draw_circle(QImage &image, const QPoint &position, unsigned int radius, const QColor &color)
+void CircleDetector::draw_circle(QImage &image, const QPoint &position, unsigned int radius, const QColor &color)
 {
   int f = 1 - radius;
   int ddF_x = 1;
@@ -157,7 +157,7 @@ void HoughCircleDetector::draw_circle(QImage &image, const QPoint &position, uns
   }
 }
 
-void HoughCircleDetector::draw_pixel(QImage &image, const QPoint &position, const QColor &color)
+void CircleDetector::draw_pixel(QImage &image, const QPoint &position, const QColor &color)
 {
   /* bounds checking */
   if(position.x() < 0 || position.x() >= image.width() ||
@@ -169,7 +169,7 @@ void HoughCircleDetector::draw_pixel(QImage &image, const QPoint &position, cons
   image.setPixel(position, color.rgb());
 }
 
-QImage HoughCircleDetector::edges(const QImage &source)
+QImage CircleDetector::edges(const QImage &source)
 {
   /* initialisation */
   QImage binary = QImage(source.size(), QImage::Format_Mono);
