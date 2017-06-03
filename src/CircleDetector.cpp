@@ -4,6 +4,7 @@
 #include <QByteArray>
 #include <QColor>
 #include <cmath>
+#include <omp.h>
 
 #define MIN(X,Y) ((X) < (Y) ? (X) : (Y))
 
@@ -31,6 +32,8 @@ QImage CircleDetector::detect(const QImage &source, unsigned int min_r, unsigned
     /* instantiate Hough-space for circles of radius i */
     Image &hough = houghs[i - min_r];
     hough.resize(binary.width());
+
+    #pragma omp parallel for collapse(2)
     for(unsigned int x = 0; x < hough.size(); x++)
     {
       hough[x].resize(binary.height());
@@ -41,6 +44,7 @@ QImage CircleDetector::detect(const QImage &source, unsigned int min_r, unsigned
     }
     
     /* find all the edges */
+    #pragma omp parallel for collapse(2)
     for(unsigned int x = 0; x < binary.width(); x++)
     {
       for(unsigned int y = 0; y < binary.height(); y++)
@@ -56,6 +60,7 @@ QImage CircleDetector::detect(const QImage &source, unsigned int min_r, unsigned
     /* loop through all the Hough-space images, searching for bright spots, which
     indicate the center of a circle, then draw circles in image-space */
     unsigned int threshold = 4.9 * i;
+    #pragma omp parallel for collapse(2)
     for(unsigned int x = 0; x < hough.size(); x++)
     {
       for(unsigned int y = 0; y < hough[x].size(); y++)

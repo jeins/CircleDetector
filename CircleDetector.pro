@@ -9,3 +9,6 @@ INCLUDEPATH += .
 # Input
 HEADERS += src/CircleDetector.h
 SOURCES += src/CircleDetector.cpp src/Main.cpp
+QMAKE_CXXFLAGS += -fopenmp
+QMAKE_LFLAGS +=  -fopenmp
+LIBS += -lgomp -lpthread
