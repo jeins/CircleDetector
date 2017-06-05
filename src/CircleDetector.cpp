@@ -33,7 +33,7 @@ QImage CircleDetector::detect(const QImage &source, unsigned int min_r, unsigned
     Image &hough = houghs[i - min_r];
     hough.resize(binary.width());
 
-    #pragma omp parallel for collapse(2)
+    //#pragma omp parallel for collapse(2) //TODO:need fix
     for(unsigned int x = 0; x < hough.size(); x++)
     {
       hough[x].resize(binary.height());
