@@ -8,7 +8,7 @@
 
 #define MIN(X,Y) ((X) < (Y) ? (X) : (Y))
 
-QImage CircleDetector::detect(const QImage &source, unsigned int min_r, unsigned int max_r)
+QImage CircleDetector::detect(const QImage &source, int min_r, int max_r)
 {
   QImage binary = edges(source);
   QImage detection = source.convertToFormat(QImage::Format_RGB888);
@@ -27,17 +27,19 @@ QImage CircleDetector::detect(const QImage &source, unsigned int min_r, unsigned
   
   QVector<Image> houghs(max_r - min_r);
   
-  for(unsigned int i = min_r; i < max_r; i++)
+  for(int i = min_r; i < max_r; i++)
   {
     /* instantiate Hough-space for circles of radius i */
     Image &hough = houghs[i - min_r];
     hough.resize(binary.width());
 
-    //#pragma omp parallel for collapse(2) //TODO:need fix
-    for(unsigned int x = 0; x < hough.size(); x++)
+    #pragma omp parallel for
+    for(int x = 0; x < hough.size(); x++)
     {
       hough[x].resize(binary.height());
-      for(unsigned int y = 0; y < hough[x].size(); y++)
+
+      #pragma omp parallel for
+      for(int y = 0; y < hough[x].size(); y++)
       {
         hough[x][y] = 0;
       }
@@ -45,9 +47,9 @@ QImage CircleDetector::detect(const QImage &source, unsigned int min_r, unsigned
     
     /* find all the edges */
     #pragma omp parallel for collapse(2)
-    for(unsigned int x = 0; x < binary.width(); x++)
+    for(int x = 0; x < binary.width(); x++)
     {
-      for(unsigned int y = 0; y < binary.height(); y++)
+      for(int y = 0; y < binary.height(); y++)
       {
         /* edge! */
         if(binary.pixelIndex(x, y) == 1)
@@ -59,11 +61,11 @@ QImage CircleDetector::detect(const QImage &source, unsigned int min_r, unsigned
     
     /* loop through all the Hough-space images, searching for bright spots, which
     indicate the center of a circle, then draw circles in image-space */
-    unsigned int threshold = 4.9 * i;
+    int threshold = 4.9 * i;
     #pragma omp parallel for collapse(2)
-    for(unsigned int x = 0; x < hough.size(); x++)
+    for(int x = 0; x < hough.size(); x++)
     {
-      for(unsigned int y = 0; y < hough[x].size(); y++)
+      for(int y = 0; y < hough[x].size(); y++)
       {
         if(hough[x][y] > threshold)
         {
@@ -76,7 +78,7 @@ QImage CircleDetector::detect(const QImage &source, unsigned int min_r, unsigned
   return detection;
 }
 
-void CircleDetector::accum_circle(Image &image, const QPoint &position, unsigned int radius)
+void CircleDetector::accum_circle(Image &image, const QPoint &position, int radius)
 {
   int f = 1 - radius;
   int ddF_x = 1;
@@ -125,7 +127,7 @@ void CircleDetector::accum_pixel(Image &image, const QPoint &position)
   image[position.x()][position.y()]++;
 }
 
-void CircleDetector::draw_circle(QImage &image, const QPoint &position, unsigned int radius, const QColor &color)
+void CircleDetector::draw_circle(QImage &image, const QPoint &position, int radius, const QColor &color)
 {
   int f = 1 - radius;
   int ddF_x = 1;
@@ -192,9 +194,9 @@ QImage CircleDetector::edges(const QImage &source)
   Ly[1][0] = +0;  Ly[1][1] = +0;  Ly[1][2] = +0;
   Ly[2][0] = -1;  Ly[2][1] = -2;  Ly[2][2] = -1;
   
-  for(unsigned int x = 0; x < source.width(); x++)
+  for(int x = 0; x < source.width(); x++)
   {
-    for(unsigned int y = 0; y < source.height(); y++)
+    for(int y = 0; y < source.height(); y++)
     {
       double new_x = 0.0, new_y = 0.0;
       

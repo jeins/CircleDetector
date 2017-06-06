@@ -20,6 +20,6 @@ int main()
   QImage result = circleDetector.detect(source, min_r, max_r);
   result.save(output);
 
-  printf("Time taken: %f", (omp_get_wtime() - start_time));
+  printf("Time taken: %f\n", (omp_get_wtime() - start_time));
   //printf("Time taken: %.2fs\n", (double)(clock() - start_time)/CLOCKS_PER_SEC);
 }
