@@ -1,6 +1,5 @@
 #include "CircleDetector.h"
 
-#include <QVector>
 #include <QByteArray>
 #include <QColor>
 #include <cmath>

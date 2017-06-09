@@ -10,8 +10,8 @@ MAKEFILE      = Makefile
 
 ####### Compiler, tools and options
 
-CC            = gcc
-CXX           = g++
+CC            = mpicc
+CXX           = mpicxx
 DEFINES       = -DQT_NO_DEBUG -DQT_GUI_LIB -DQT_CORE_LIB
 CFLAGS        = -m64 -pipe -O2 -Wall -W -D_REENTRANT -fPIC $(DEFINES)
 CXXFLAGS      = -m64 -pipe -fopenmp -O2 -Wall -W -D_REENTRANT -fPIC $(DEFINES)
@@ -33,8 +33,8 @@ MOVE          = mv -f
 TAR           = tar -cf
 COMPRESS      = gzip -9f
 DISTNAME      = CircleDetector1.0.0
-DISTDIR = /home/parsys/Documents/CircleDetector/.tmp/CircleDetector1.0.0
-LINK          = g++
+DISTDIR = /parsys/CircleDetector/.tmp/CircleDetector1.0.0
+LINK          = mpicxx
 LFLAGS        = -m64 -fopenmp -Wl,-O1
 LIBS          = $(SUBLIBS) -L/usr/X11R6/lib64 -lgomp -lQt5Gui -lQt5Core -lGL -lpthread 
 AR            = ar cqs

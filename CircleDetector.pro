@@ -9,6 +9,13 @@ INCLUDEPATH += .
 # Input
 HEADERS += src/CircleDetector.h
 SOURCES += src/CircleDetector.cpp src/Main.cpp
+
+# OpenMP Settings
 QMAKE_CXXFLAGS += -fopenmp
 QMAKE_LFLAGS +=  -fopenmp
 LIBS += -lgomp -lpthread
+
+# MPI Settings
+QMAKE_CXX = mpicxx
+QMAKE_LINK = $$QMAKE_CXX
+QMAKE_CC = mpicc
