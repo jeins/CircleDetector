@@ -8,6 +8,8 @@ class CircleDetector
 { 
   public: 
     QImage detect(const QImage &source, int min_r, int max_r);
+    void tester(int min_r, int max_r, const QImage &binary, QImage &detection);
+    QImage edges(const QImage &source);
   
   private:
     void accum_circle(Image &image, const QPoint &position, int radius);
@@ -16,5 +18,4 @@ class CircleDetector
     void draw_circle(QImage &image, const QPoint &position, int radius, const QColor &color);
     void draw_pixel(QImage &image, const QPoint &position, const QColor &color);
     
-    QImage edges(const QImage &source);
 };

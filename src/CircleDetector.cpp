@@ -24,58 +24,67 @@ QImage CircleDetector::detect(const QImage &source, int min_r, int max_r)
     max_r = MIN(source.width(), source.height()) / 2;
   }
   
+  tester(10, 30, binary, detection);
+  tester(30, 50, binary, detection);
+  tester(50, 90, binary, detection);
+  tester(90, 130, binary, detection);
+  tester(130, 200, binary, detection);
+    
+  return detection;
+}
+
+void CircleDetector::tester(int min_r, int max_r, const QImage &binary, QImage &detection)
+{
   QVector<Image> houghs(max_r - min_r);
   
   for(int i = min_r; i < max_r; i++)
   {
-    /* instantiate Hough-space for circles of radius i */
-    Image &hough = houghs[i - min_r];
-    hough.resize(binary.width());
-
-    #pragma omp parallel for
-    for(int x = 0; x < hough.size(); x++)
-    {
-      hough[x].resize(binary.height());
+      /* instantiate Hough-space for circles of radius i */
+      Image &hough = houghs[i - min_r];
+      hough.resize(binary.width());
 
       #pragma omp parallel for
-      for(int y = 0; y < hough[x].size(); y++)
+      for(int x = 0; x < hough.size(); x++)
       {
-        hough[x][y] = 0;
-      }
-    }
-    
-    /* find all the edges */
-    #pragma omp parallel for collapse(2)
-    for(int x = 0; x < binary.width(); x++)
-    {
-      for(int y = 0; y < binary.height(); y++)
-      {
-        /* edge! */
-        if(binary.pixelIndex(x, y) == 1)
+        hough[x].resize(binary.height());
+
+        #pragma omp parallel for
+        for(int y = 0; y < hough[x].size(); y++)
         {
-          accum_circle(hough, QPoint(x, y), i);
+          hough[x][y] = 0;
         }
       }
-    }
-    
-    /* loop through all the Hough-space images, searching for bright spots, which
-    indicate the center of a circle, then draw circles in image-space */
-    int threshold = 4.9 * i;
-    #pragma omp parallel for collapse(2)
-    for(int x = 0; x < hough.size(); x++)
-    {
-      for(int y = 0; y < hough[x].size(); y++)
+      
+      /* find all the edges */
+      #pragma omp parallel for collapse(2)
+      for(int x = 0; x < binary.width(); x++)
       {
-        if(hough[x][y] > threshold)
+        for(int y = 0; y < binary.height(); y++)
         {
-          draw_circle(detection, QPoint(x, y), i, Qt::yellow);
+          /* edge! */
+          if(binary.pixelIndex(x, y) == 1)
+          {
+            accum_circle(hough, QPoint(x, y), i);
+          }
+        }
+      }
+      
+      /* loop through all the Hough-space images, searching for bright spots, which
+      indicate the center of a circle, then draw circles in image-space */
+      int threshold = 4.9 * i;
+      #pragma omp parallel for collapse(2)
+      for(int x = 0; x < hough.size(); x++)
+      {
+        for(int y = 0; y < hough[x].size(); y++)
+        {
+          if(hough[x][y] > threshold)
+          {
+            draw_circle(detection, QPoint(x, y), i, Qt::yellow);
+          }
         }
       }
     }
   }
-    
-  return detection;
-}
 
 void CircleDetector::accum_circle(Image &image, const QPoint &position, int radius)
 {
