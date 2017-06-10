@@ -8,7 +8,7 @@ class CircleDetector
 { 
   public: 
     QImage detect(const QImage &source, int min_r, int max_r);
-    void tester(int min_r, int max_r, const QImage &binary, QImage &detection);
+    void tester(int min_r, int max_r, const QImage &binary, QImage &detection, int rank);
     QImage edges(const QImage &source);
   
   private:

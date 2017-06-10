@@ -53,11 +53,9 @@ int main()
 
   // QImage result = circleDetector.detect(source, min_r, max_r);
 
-  QImage binary = cd.edges(source);
-  QImage detection = source.convertToFormat(QImage::Format_RGB888);
 
   int* min_max_process;
-  int *min_max_local = (int*) malloc(sizeof(int) * 2);;
+  int *min_max_local = (int*) malloc(sizeof(int) * 2);
   
   if (world_rank == 0) {
     min_max_process = generateMinMaxEachProcess(50, 200, world_size);
@@ -65,7 +63,13 @@ int main()
 
   MPI_Scatter(min_max_process, 2, MPI_INT, min_max_local, 2, MPI_INT, 0, MPI_COMM_WORLD);
 
-//cd.tester(min_max_local[0], min_max_local[1], binary, detection);
+  QImage binary = cd.edges(source);
+  QImage detection = source.convertToFormat(QImage::Format_RGB888);
+
+
+  cd.tester(min_max_local[0], min_max_local[1], binary, detection, world_rank);
+
+  //MPI_Gather(detection, 1, MPI_INT, detections, 1, MPI_INT, 0, MPI_COMM_WORLD);
 
 
 

@@ -24,17 +24,18 @@ QImage CircleDetector::detect(const QImage &source, int min_r, int max_r)
     max_r = MIN(source.width(), source.height()) / 2;
   }
   
-  tester(10, 30, binary, detection);
-  tester(30, 50, binary, detection);
-  tester(50, 90, binary, detection);
-  tester(90, 130, binary, detection);
-  tester(130, 200, binary, detection);
+  // tester(10, 30, binary, detection);
+  // tester(30, 50, binary, detection);
+  // tester(50, 90, binary, detection);
+  // tester(90, 130, binary, detection);
+  // tester(130, 200, binary, detection);
     
   return detection;
 }
 
-void CircleDetector::tester(int min_r, int max_r, const QImage &binary, QImage &detection)
+void CircleDetector::tester(int min_r, int max_r, const QImage &binary, QImage &detection, int rank)
 {
+  QString output = QString("result_%1.jpg").arg(rank);
   QVector<Image> houghs(max_r - min_r);
   
   for(int i = min_r; i < max_r; i++)
@@ -84,6 +85,8 @@ void CircleDetector::tester(int min_r, int max_r, const QImage &binary, QImage &
         }
       }
     }
+printf("saved data : %d", rank );
+    detection.save(output);
   }
 
 void CircleDetector::accum_circle(Image &image, const QPoint &position, int radius)
