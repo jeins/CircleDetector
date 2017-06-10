@@ -49,7 +49,7 @@ int main()
   
   CircleDetector cd;  
   //clock_t start_time = clock();
-  // double start_time = omp_get_wtime();
+  double start_time = MPI_Wtime();
 
   // QImage result = circleDetector.detect(source, min_r, max_r);
 
@@ -75,8 +75,8 @@ printf("rank: %d | min: %d | max: %d", world_rank, min_max_local[0], min_max_loc
 
 
 
+  printf("Time taken: %f\n", (MPI_Wtime() - start_time));
   MPI_Finalize();
 
-  // printf("Time taken: %f\n", (omp_get_wtime() - start_time));
   //printf("Time taken: %.2fs\n", (double)(clock() - start_time)/CLOCKS_PER_SEC);
 }
