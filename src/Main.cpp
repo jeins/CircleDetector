@@ -45,7 +45,7 @@ int main()
 
   QImage source("test.gif");
   QString output("result.jpg");
-  unsigned int min_r = 50, max_r = 200;
+  unsigned int min_r = 10, max_r = 100;
   
   CircleDetector cd;  
   //clock_t start_time = clock();
@@ -58,7 +58,7 @@ int main()
   int *min_max_local = (int*) malloc(sizeof(int) * 2);
   
   if (world_rank == 0) {
-    min_max_process = generateMinMaxEachProcess(50, 200, world_size);
+    min_max_process = generateMinMaxEachProcess(min_r, max_r, world_size);
   }
 
   MPI_Scatter(min_max_process, 2, MPI_INT, min_max_local, 2, MPI_INT, 0, MPI_COMM_WORLD);
@@ -70,6 +70,8 @@ int main()
   cd.tester(min_max_local[0], min_max_local[1], binary, detection, world_rank);
 
   //MPI_Gather(detection, 1, MPI_INT, detections, 1, MPI_INT, 0, MPI_COMM_WORLD);
+
+printf("rank: %d | min: %d | max: %d", world_rank, min_max_local[0], min_max_local[1]);
 
 
 

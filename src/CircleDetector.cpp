@@ -85,7 +85,6 @@ void CircleDetector::tester(int min_r, int max_r, const QImage &binary, QImage &
         }
       }
     }
-printf("saved data : %d", rank );
     detection.save(output);
   }
 
