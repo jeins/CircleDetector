@@ -1,14 +1,15 @@
 #include <QImage>
 #include <QVector>
+#include <mpi.h>
 
 typedef QVector<unsigned int> IntArray;
 typedef QVector<IntArray>     Image;
 
 class CircleDetector
-{ 
+{
   public: 
     QImage detect(const QImage &source, int min_r, int max_r);
-    void tester(int min_r, int max_r, const QImage &binary, QImage &detection, int rank);
+    void tester(int min_r, int max_r, const QImage &binary, QImage &detection, MPI_Datatype datatype, MPI_Comm comm);
     QImage edges(const QImage &source);
   
   private:

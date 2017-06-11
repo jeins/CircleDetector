@@ -3,9 +3,14 @@
 #include <QByteArray>
 #include <QColor>
 #include <cmath>
-#include <omp.h>
+//#include <omp.h>
+#include <mpi.h>
 
 #define MIN(X,Y) ((X) < (Y) ? (X) : (Y))
+
+typedef struct{
+ int comm_rank;
+} CommRankNumber;
 
 QImage CircleDetector::detect(const QImage &source, int min_r, int max_r)
 {
@@ -33,9 +38,13 @@ QImage CircleDetector::detect(const QImage &source, int min_r, int max_r)
   return detection;
 }
 
-void CircleDetector::tester(int min_r, int max_r, const QImage &binary, QImage &detection, int rank)
+void CircleDetector::tester(int min_r, int max_r, const QImage &binary, QImage &detection, MPI_Datatype, MPI_Comm comm)
 {
-  QString output = QString("result_%1.jpg").arg(rank);
+  int comm_size, comm_rank;
+  MPI_Comm_size(comm, &comm_size);
+  MPI_Comm_rank(comm, &comm_rank);
+  
+  QString output = QString("result_%1.jpg").arg(comm_rank);
   QVector<Image> houghs(max_r - min_r);
   
   for(int i = min_r; i < max_r; i++)
@@ -44,12 +53,12 @@ void CircleDetector::tester(int min_r, int max_r, const QImage &binary, QImage &
       Image &hough = houghs[i - min_r];
       hough.resize(binary.width());
 
-      #pragma omp parallel for
+      //#pragma omp parallel for
       for(int x = 0; x < hough.size(); x++)
       {
         hough[x].resize(binary.height());
 
-        #pragma omp parallel for
+        //#pragma omp parallel for
         for(int y = 0; y < hough[x].size(); y++)
         {
           hough[x][y] = 0;
@@ -57,7 +66,7 @@ void CircleDetector::tester(int min_r, int max_r, const QImage &binary, QImage &
       }
       
       /* find all the edges */
-      #pragma omp parallel for collapse(2)
+      //#pragma omp parallel for collapse(2)
       for(int x = 0; x < binary.width(); x++)
       {
         for(int y = 0; y < binary.height(); y++)
@@ -73,7 +82,7 @@ void CircleDetector::tester(int min_r, int max_r, const QImage &binary, QImage &
       /* loop through all the Hough-space images, searching for bright spots, which
       indicate the center of a circle, then draw circles in image-space */
       int threshold = 4.9 * i;
-      #pragma omp parallel for collapse(2)
+      //#pragma omp parallel for collapse(2)
       for(int x = 0; x < hough.size(); x++)
       {
         for(int y = 0; y < hough[x].size(); y++)
@@ -205,7 +214,7 @@ QImage CircleDetector::edges(const QImage &source)
   Ly[2][0] = -1;  Ly[2][1] = -2;  Ly[2][2] = -1;
   
 
-  #pragma omp parallel for collapse(2)
+  //#pragma omp parallel for collapse(2)
   for(int x = 0; x < source.width(); x++)
   {
     for(int y = 0; y < source.height(); y++)
@@ -213,7 +222,7 @@ QImage CircleDetector::edges(const QImage &source)
       double new_x = 0.0, new_y = 0.0;
       
       /* gradient */
-      #pragma omp parallel for collapse(2)
+      //#pragma omp parallel for collapse(2)
       for(int i = -1; i <= 1; i++)
       {
         for(int j = -1; j <= 1; j++)

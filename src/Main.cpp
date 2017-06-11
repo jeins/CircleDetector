@@ -4,7 +4,7 @@
 #include <QImageReader>
 #include <time.h>
 #include <mpi.h>
-#include <math.h> 
+#include <math.h>
 
 #include "CircleDetector.h"
 
@@ -27,16 +27,18 @@ int* generateMinMaxEachProcess(int min, int max, int comSize)
     } else{
       arrProcess[i] = tmpN;
     }
-    
-    tmpN += sumEachProcess; 
+
+    tmpN += sumEachProcess;
   }
 
   return arrProcess;
 }
 
 int main()
-{
+{ 
+  double duration, starttime, endtime;
   MPI_Init(NULL, NULL);
+  starttime = MPI_Wtime();
 
   int world_rank;
   MPI_Comm_rank(MPI_COMM_WORLD, &world_rank);
@@ -46,37 +48,44 @@ int main()
   QImage source("test.gif");
   QString output("result.jpg");
   unsigned int min_r = 10, max_r = 100;
-  
-  CircleDetector cd;  
-  //clock_t start_time = clock();
-  double start_time = MPI_Wtime();
+
+  CircleDetector cd;
 
   // QImage result = circleDetector.detect(source, min_r, max_r);
 
-
   int* min_max_process;
   int *min_max_local = (int*) malloc(sizeof(int) * 2);
-  
+
   if (world_rank == 0) {
     min_max_process = generateMinMaxEachProcess(min_r, max_r, world_size);
   }
 
+  //get processor name
+  char processor_name[MPI_MAX_PROCESSOR_NAME];
+  int name_len;
+  MPI_Get_processor_name(processor_name, &name_len);
+
   MPI_Scatter(min_max_process, 2, MPI_INT, min_max_local, 2, MPI_INT, 0, MPI_COMM_WORLD);
 
+  MPI_Barrier(MPI_COMM_WORLD);
+  double start_time = MPI_Wtime();
+ 
   QImage binary = cd.edges(source);
   QImage detection = source.convertToFormat(QImage::Format_RGB888);
 
+  cd.tester(min_max_local[0], min_max_local[1], binary, detection, MPI_DOUBLE, MPI_COMM_WORLD);
+  
+  MPI_Barrier(MPI_COMM_WORLD);
+  double duration_time = MPI_Wtime() - start_time;
 
-  cd.tester(min_max_local[0], min_max_local[1], binary, detection, world_rank);
+  printf("PName: %s| Rank: %d | min: %d | max: %d | Elapsed time: %g\n",processor_name, world_rank,min_max_local[0], min_max_local[1],duration_time);
 
-  //MPI_Gather(detection, 1, MPI_INT, detections, 1, MPI_INT, 0, MPI_COMM_WORLD);
+  endtime = MPI_Wtime();
+  duration = endtime - starttime;
 
-printf("rank: %d | min: %d | max: %d", world_rank, min_max_local[0], min_max_local[1]);
-
-
-
-  printf("Time taken: %f\n", (MPI_Wtime() - start_time));
   MPI_Finalize();
-
-  //printf("Time taken: %.2fs\n", (double)(clock() - start_time)/CLOCKS_PER_SEC);
+  if(world_rank == 0){
+ 	 printf("GLobal time %g\n",duration);
+  }
+  return 0;
 }
