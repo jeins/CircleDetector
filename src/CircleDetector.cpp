@@ -16,7 +16,7 @@ void CircleDetector::detect(int min_r, int max_r, const QImage &binary, QImage &
   QVector<Image> houghs(max_r - min_r);
 
   MPI_Datatype rtype;
-  MPI_Type_contiguous( 3, MPI_INT, &rtype ); 
+  MPI_Type_contiguous( 4, MPI_INT, &rtype ); 
   MPI_Type_commit( &rtype ); 
 
   #pragma omp parallel for
@@ -54,36 +54,39 @@ void CircleDetector::detect(int min_r, int max_r, const QImage &binary, QImage &
       
       /* loop through all the Hough-space images, searching for bright spots, which
       indicate the center of a circle, then draw circles in image-space */
-      int threshold = 4.9 * i;
+
       #pragma omp parallel for collapse(2)
       for(int x = 0; x < hough.size(); x++)
       {
         for(int y = 0; y < hough[x].size(); y++)
         {
-          int local_data[] = {i, x, y};
+          int local_data[] = {i, x, y, hough[x][y]};
           int *global_data = NULL;
           if (rank == 0) {
-            global_data = (int*)malloc(sizeof(int) * size * 3);
+            global_data = (int*)malloc(sizeof(int) * size * 4);
           }
-
+          MPI_Gather(local_data, 4, MPI_INT, 
+                      global_data, 1, rtype, 
+                      0, MPI_COMM_WORLD);
+          
           // MPI_Request reqG;
-          // MPI_Igather(local_data, 3, MPI_INT, 
+          // MPI_Igather(local_data, 4, MPI_INT, 
           //             global_data, 1, rtype, 
           //             0, MPI_COMM_WORLD, &reqG);
           // MPI_Wait(&reqG, MPI_STATUS_IGNORE);
-          MPI_Gather(local_data, 3, MPI_INT, 
-                      global_data, 1, rtype, 
-                      0, MPI_COMM_WORLD);
 
           if (rank == 0) {
-            if(hough[x][y] > threshold){
-              for(int t=0; t<(size*3); t+=3){
+              for(int t=0; t<(size*4); t+=4){     
                 int rVal = global_data[t];
                 int xVal = global_data[t+1];
                 int yVal = global_data[t+2];
-
-                draw_circle(detection, QPoint(xVal, yVal), rVal, Qt::yellow);
-              }
+                int houghVal = global_data[t+3];
+                int threshold = 4.9 * rVal;
+                   
+               if(houghVal > threshold){
+                  // printf("i: %d | x: %d | y: %d\n", rVal, xVal, yVal);
+                  draw_circle(detection, QPoint(xVal, yVal), rVal, Qt::yellow);
+               }
             }
               free(global_data);
           }
