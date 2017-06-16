@@ -1,0 +1,13 @@
+PROJECT_NAME = Cirlce Detector
+PROJECT_BRIEF = "Circle Detector With Hough-Transformation Algorithm"
+OUTPUT_DIRECTORY = doc
+OUTPUT_LANGUAGE = English
+INPUT = src 
+INPUT_ENCODING = UTF-8
+FILE_PATTERNS = *.cpp \
+		*.h
+RECURSIVE = YES
+FILTER_SOURCE_FILES = YES
+GENERATE_HTML = YES
+HTML_OUTPUT = html
+HTML_FILE_EXTENSION = .html
