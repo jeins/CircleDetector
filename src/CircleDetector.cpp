@@ -6,14 +6,18 @@
 #include <omp.h>
 #include <mpi.h>
 #include <stdio.h>
+#include <string> 
 
 #define MIN(X,Y) ((X) < (Y) ? (X) : (Y))
 
-void CircleDetector::detect(int min_r, int max_r, const QImage &binary, QImage &detection, int rank, int*** &tmps)
+void CircleDetector::detect(int min_r, int max_r, const QImage &binary, QImage &detection, int rank, int size)
 {
-  QString output = QString("result_%1.jpg").arg(rank);
+  printf("rank %d start | min: %d | max: %d\n", rank, min_r, max_r);
   QVector<Image> houghs(max_r - min_r);
-  tmps = new int**[max_r - min_r];
+
+  MPI_Datatype rtype;
+  MPI_Type_contiguous( 3, MPI_INT, &rtype ); 
+  MPI_Type_commit( &rtype ); 
 
   #pragma omp parallel for
   for(int i = min_r; i < max_r; i++)
@@ -21,20 +25,16 @@ void CircleDetector::detect(int min_r, int max_r, const QImage &binary, QImage &
       /* instantiate Hough-space for circles of radius i */
       Image &hough = houghs[i - min_r];
       hough.resize(binary.width());
-      int id = i - min_r;
-      tmps[id] = new int*[binary.width()];
 
       #pragma omp parallel for
       for(int x = 0; x < hough.size(); x++)
       {
         hough[x].resize(binary.height());
-        tmps[id][x] = new int[binary.height()];
 
         #pragma omp parallel for
         for(int y = 0; y < hough[x].size(); y++)
         {
           hough[x][y] = 0;
-          tmps[id][x][y] = 0;
         }
       }
       
@@ -49,7 +49,6 @@ void CircleDetector::detect(int min_r, int max_r, const QImage &binary, QImage &
           {
             accum_circle(hough, QPoint(x, y), i);
           } 
-
         }
       }
       
@@ -61,10 +60,38 @@ void CircleDetector::detect(int min_r, int max_r, const QImage &binary, QImage &
       {
         for(int y = 0; y < hough[x].size(); y++)
         {
-          tmps[id][x][y] = hough[x][y];
+          int local_data[] = {i, x, y};
+          int *global_data = NULL;
+          if (rank == 0) {
+            global_data = (int*)malloc(sizeof(int) * size * 3);
+          }
+
+          // MPI_Request reqG;
+          // MPI_Igather(local_data, 3, MPI_INT, 
+          //             global_data, 1, rtype, 
+          //             0, MPI_COMM_WORLD, &reqG);
+          // MPI_Wait(&reqG, MPI_STATUS_IGNORE);
+          MPI_Gather(local_data, 3, MPI_INT, 
+                      global_data, 1, rtype, 
+                      0, MPI_COMM_WORLD);
+
+          if (rank == 0) {
+            if(hough[x][y] > threshold){
+              for(int t=0; t<(size*3); t+=3){
+                int rVal = global_data[t];
+                int xVal = global_data[t+1];
+                int yVal = global_data[t+2];
+
+                draw_circle(detection, QPoint(xVal, yVal), rVal, Qt::yellow);
+              }
+            }
+              free(global_data);
+          }
         }
       }
     }
+
+    printf("rank %d done | min: %d | max: %d\n", rank, min_r, max_r);
   }
 
 void CircleDetector::accum_circle(Image &image, const QPoint &position, int radius)
