@@ -15,9 +15,12 @@ void CircleDetector::detect(int min_r, int max_r, const QImage &binary, QImage &
   printf("rank %d start | min: %d | max: %d\n", rank, min_r, max_r);
   QVector<Image> houghs(max_r - min_r);
 
+  MPI_Status status;
   MPI_Datatype rtype;
-  MPI_Type_contiguous( 4, MPI_INT, &rtype ); 
-  MPI_Type_commit( &rtype ); 
+  MPI_Request request=MPI_REQUEST_NULL;
+  MPI_Request req=MPI_REQUEST_NULL;
+  MPI_Type_contiguous( 3, MPI_INT, &rtype ); 
+  MPI_Type_commit( &rtype); 
 
   #pragma omp parallel for
   for(int i = min_r; i < max_r; i++)
@@ -54,7 +57,7 @@ void CircleDetector::detect(int min_r, int max_r, const QImage &binary, QImage &
       
       /* loop through all the Hough-space images, searching for bright spots, which
       indicate the center of a circle, then draw circles in image-space */
-
+      int threshold = 4.9 * i;
       #pragma omp parallel for collapse(2)
       for(int x = 0; x < hough.size(); x++)
       {
@@ -63,37 +66,35 @@ void CircleDetector::detect(int min_r, int max_r, const QImage &binary, QImage &
           int local_data[] = {i, x, y, hough[x][y]};
           int *global_data = NULL;
           if (rank == 0) {
-            global_data = (int*)malloc(sizeof(int) * size * 4);
+            global_data = (int*)malloc(sizeof(int) * size * 3);
           }
-          MPI_Gather(local_data, 4, MPI_INT, 
-                      global_data, 1, rtype, 
-                      0, MPI_COMM_WORLD);
-          
-          // MPI_Request reqG;
-          // MPI_Igather(local_data, 4, MPI_INT, 
-          //             global_data, 1, rtype, 
-          //             0, MPI_COMM_WORLD, &reqG);
-          // MPI_Wait(&reqG, MPI_STATUS_IGNORE);
 
-          if (rank == 0) {
-              for(int t=0; t<(size*4); t+=4){     
-                int rVal = global_data[t];
-                int xVal = global_data[t+1];
-                int yVal = global_data[t+2];
-                int houghVal = global_data[t+3];
-                int threshold = 4.9 * rVal;
-                   
-               if(houghVal > threshold){
-                  // printf("i: %d | x: %d | y: %d\n", rVal, xVal, yVal);
-                  draw_circle(detection, QPoint(xVal, yVal), rVal, Qt::yellow);
-               }
-            }
-              free(global_data);
+          if(hough[x][y] > threshold){
+            MPI_Isend(local_data, 3, MPI_INT, 0, 0, MPI_COMM_WORLD, &request);
           }
+
+          if(rank == 0){
+            int flag=0;
+            MPI_Iprobe( MPI_ANY_SOURCE, 0, MPI_COMM_WORLD, &flag, &status );
+
+            if(flag){
+              MPI_Irecv( global_data, 1, rtype,MPI_ANY_SOURCE , 0, MPI_COMM_WORLD, &req );
+              
+              int rVal = global_data[0];
+              int xVal = global_data[1];
+              int yVal = global_data[2];
+              
+              draw_circle(detection, QPoint(xVal, yVal), rVal, Qt::yellow);
+            }
+          }
+          
+          free(global_data);
         }
       }
     }
 
+    MPI_Wait(&req, &status);
+    MPI_Wait(&request, &status);
     printf("rank %d done | min: %d | max: %d\n", rank, min_r, max_r);
   }
 
