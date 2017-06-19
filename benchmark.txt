@@ -1,0 +1,101 @@
+rank 0 start | min: 10 | max: 25
+rank 1 start | min: 25 | max: 40
+rank 5 start | min: 85 | max: 100
+rank 3 start | min: 55 | max: 70
+rank 4 start | min: 70 | max: 85
+rank 2 start | min: 40 | max: 55
+rank 1 done | min: 25 | max: 40
+rank 2 done | min: 40 | max: 55
+rank 3 done | min: 55 | max: 70
+rank 0 done | min: 10 | max: 25
+rank 4 done | min: 70 | max: 85
+rank 5 done | min: 85 | max: 100
+Done! PName: parsysB| Rank: 4 | min: 70 | max: 85 | Elapsed time: 3.85045
+Done! PName: parsysC| Rank: 2 | min: 40 | max: 55 | Elapsed time: 3.84986
+Done! PName: parsysC| Rank: 0 | min: 10 | max: 25 | Elapsed time: 3.85684
+Done! PName: parsysB| Rank: 5 | min: 85 | max: 100 | Elapsed time: 4.00885
+Done! PName: parsysA| Rank: 1 | min: 25 | max: 40 | Elapsed time: 4.01771
+Done! PName: parsysA| Rank: 3 | min: 55 | max: 70 | Elapsed time: 4.01248
+
+GLobal time 4.23399
+
+
+-----------------------------
+
+rank 4 start | min: 82 | max: 100
+rank 0 start | min: 10 | max: 28
+rank 1 start | min: 28 | max: 46
+rank 2 start | min: 46 | max: 64
+rank 3 start | min: 64 | max: 82
+rank 1 done | min: 28 | max: 46
+rank 2 done | min: 46 | max: 64
+rank 0 done | min: 10 | max: 28
+rank 3 done | min: 64 | max: 82
+rank 4 done | min: 82 | max: 100
+Done! PName: parsysC| Rank: 2 | min: 46 | max: 64 | Elapsed time: 4.98669
+Done! PName: parsysB| Rank: 4 | min: 82 | max: 100 | Elapsed time: 5.04442
+Done! PName: parsysC| Rank: 0 | min: 10 | max: 28 | Elapsed time: 5.03237
+Done! PName: parsysA| Rank: 1 | min: 28 | max: 46 | Elapsed time: 5.03229
+Done! PName: parsysA| Rank: 3 | min: 64 | max: 82 | Elapsed time: 4.99419
+GLobal time 5.2011
+
+
+-----------------------------
+rank 1 start | min: 32 | max: 54
+rank 0 start | min: 10 | max: 32
+rank 2 start | min: 54 | max: 76
+rank 3 start | min: 76 | max: 98
+rank 1 done | min: 32 | max: 54
+rank 0 done | min: 10 | max: 32
+rank 2 done | min: 54 | max: 76
+rank 3 done | min: 76 | max: 98
+Done! PName: parsysC| Rank: 0 | min: 10 | max: 32 | Elapsed time: 6.00871
+Done! PName: parsysA| Rank: 1 | min: 32 | max: 54 | Elapsed time: 6.01068
+Done! PName: parsysA| Rank: 3 | min: 76 | max: 98 | Elapsed time: 5.99744
+Done! PName: parsysC| Rank: 2 | min: 54 | max: 76 | Elapsed time: 6.00941
+GLobal time 6.21914
+
+------------------------------
+
+rank 0 start | min: 10 | max: 40
+rank 1 start | min: 40 | max: 70
+rank 2 start | min: 70 | max: 100
+rank 1 done | min: 40 | max: 70
+rank 0 done | min: 10 | max: 40
+rank 2 done | min: 70 | max: 100
+Done! PName: parsysC| Rank: 0 | min: 10 | max: 40 | Elapsed time: 6.96242
+Done! PName: parsysC| Rank: 2 | min: 70 | max: 100 | Elapsed time: 6.96183
+Done! PName: parsysA| Rank: 1 | min: 40 | max: 70 | Elapsed time: 6.96532
+GLobal time 7.14263
+
+--------------------------------
+
+rank 1 start | min: 55 | max: 100
+rank 0 start | min: 10 | max: 55
+rank 1 done | min: 55 | max: 100
+rank 0 done | min: 10 | max: 55
+Done! PName: parsysA| Rank: 1 | min: 55 | max: 100 | Elapsed time: 9.46873
+Done! PName: parsysC| Rank: 0 | min: 10 | max: 55 | Elapsed time: 9.46865
+GLobal time 9.5973
+
+
+
+---------------------------------
+
+rank 1 start | min: 55 | max: 100
+rank 0 start | min: 10 | max: 55
+rank 1 done | min: 55 | max: 100
+rank 0 done | min: 10 | max: 55
+Done! PName: parsysA| Rank: 1 | min: 55 | max: 100 | Elapsed time: 9.46873
+Done! PName: parsysC| Rank: 0 | min: 10 | max: 55 | Elapsed time: 9.46865
+GLobal time 9.5973
+
+-------------------------------
+
+rank 0 start | min: 10 | max: 100
+rank 0 done | min: 10 | max: 100
+Done! PName: parsysC| Rank: 0 | min: 10 | max: 100 | Elapsed time: 15.2958
+GLobal time 15.385
+
+
+
