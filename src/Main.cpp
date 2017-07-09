@@ -3,14 +3,15 @@
 #include <QDebug>
 #include <QImageReader>
 #include <time.h>
-#include <mpi.h>
 #include <math.h>
-#include <QColor>
 #include <iostream>
 #include <stdlib.h>
 
 #include "CircleDetector.h"
 
+/**
+* generate min max radius for each slaves
+*/
 int *generate_min_max_radius(int min, int max, int comSize)
 {
   int sumEachProcess = ceil((max - min) / comSize);
