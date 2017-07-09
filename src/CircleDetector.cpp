@@ -215,7 +215,7 @@ QImage CircleDetector::edges(const QImage &source)
   Ly[2][0] = -1;  Ly[2][1] = -2;  Ly[2][2] = -1;
   
 
-  //#pragma omp parallel for collapse(2)
+  #pragma omp parallel for collapse(2)
   for(int x = 0; x < source.width(); x++)
   {
     for(int y = 0; y < source.height(); y++)
@@ -223,7 +223,7 @@ QImage CircleDetector::edges(const QImage &source)
       double new_x = 0.0, new_y = 0.0;
       
       /* gradient */
-      //#pragma omp parallel for collapse(2)
+      #pragma omp parallel for collapse(2)
       for(int i = -1; i <= 1; i++)
       {
         for(int j = -1; j <= 1; j++)
