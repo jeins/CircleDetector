@@ -1,5 +1,13 @@
 # CircleDetector
-circle detector with hough-transformation algorithm
+circle detector with hough-transformation algorithm on parallel computing.
+
+## Environment
+* Ubuntu 16.04(Master) & mini ubuntu(Slave)
+* OpenMP & OpenMPI
+* Qt5
+* NFS (Network File System)
+* OpenSSH
+
 ## Compile 
 * $ qmake -project ##first time to create .pro
 * $ qmake
